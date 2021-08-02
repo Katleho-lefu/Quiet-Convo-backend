@@ -9,25 +9,25 @@ export class CarController {
     constructor(private carService: CarService) {}
 
     @Get()
-    async getCars(){
+     async getCars(){
         const cars =  await this.carService.getCars();
         return cars;
     }
 
     @Get(':id')
-    getCar(@Param('id') id){
-       const result =  this.carService.getOneCar(id);
+     async getCar(@Param('id') id:string){
+       const result = await this.carService.getOneCar(id);
        return result;
     }
 
     @Post()
-    async addCar(@Body() car:CarModel){
-        const cars = await this.carService.addCar(car)
-        return cars;
+     async addCar(@Body() car: CarModel){
+        const new_car = await this.carService.addCar(car);
+        return new_car;
     }
 
     @Delete()
-    async deleteCar(@Query() query){
+     async deleteCar(@Query() query){
         const cars = await this.carService.deleteCar(query.id);
         return cars;
     }

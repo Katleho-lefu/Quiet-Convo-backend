@@ -1,8 +1,11 @@
+import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { CarController } from './car.controller';
 import { CarService } from './car.service';
+import { CarModel, CarSchema } from './car.model';
 
 @Module({
+  imports: [MongooseModule.forFeature([{ name: 'CarSchema', schema: CarSchema}])],
   controllers: [CarController],
   providers: [CarService]
 })
