@@ -14,10 +14,9 @@ Cars: any[]= CARS;
     constructor(@InjectModel('CarSchema') private readonly carModel: Model<CarModel> ){}
 
     //get all the cars
-    getCars(): Promise<any>{
-        return new Promise(resolve =>{
-            resolve(this.Cars)
-        })
+    getCars(){
+      const cars= this.carModel.find();
+      return cars;
     }
  
     //get one car by id
