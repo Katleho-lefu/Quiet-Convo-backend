@@ -1,8 +1,6 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { timeStamp } from 'node:console';
-import { resolve } from 'node:path';
 import { CarModel, CarSchema } from './car.model';
 import { CARS } from './cars.mock';
 
@@ -11,23 +9,19 @@ export class CarService {
 
 Cars: any[]= CARS;
 
-    constructor(@InjectModel('CarSchema') private readonly carModel: Model<CarModel> ){}
+    constructor(@InjectModel('CarSchema') private readonly carModel: Model<CarModel>){}
 
     //get all the cars
-    getCars(){
-      const cars= this.carModel.find();
+    async getCars(){
+      const cars= await this.carModel.find().exec();
       return cars;
     }
- 
+
     //get one car by id
-    getOneCar(car_id): Promise<any> {
-        return new Promise(resolve =>{
-            let car= this.Cars.find(item=> item.id===car_id);
-            if (!car){
-                throw new HttpException(`Car with index ${car_id} doesn't exist`, 404);
-            }
-            resolve (car);
-        });      
+    getOneCar(car_id){
+            const car= this.carModel.findById(car_id);
+            console.log(car);
+            return car;
     }
 
     // Create a car
@@ -38,18 +32,21 @@ Cars: any[]= CARS;
             model: car.model,
         })
          const results = await new_car.save();
-         return results
-    } 
+         return results;
+    }
+
+    
 
     //delete a car by car_id
     deleteCar(car_id): Promise<any>{
-        return new Promise(resolve =>{
-            const index = this.Cars.findIndex(car => car.id===car_id);
-            this.Cars.splice(index, 1)
-            if (index == -1){
-                throw new HttpException(`Item at ${car_id} doesn't exist`, 404);}
-            resolve(this.Cars)
+        return new Promise(resolve=>{
+            const car = this.carModel.findByIdAndRemove(car_id);
+            if(!car){
+                throw new HttpException('this car is not found', 404)
+            }
+            resolve(car);
         })
     }
+
 
 }
