@@ -42,9 +42,9 @@ Cars: any[]= CARS;
     }
 
     //delete a car by car_id
-    deleteCar(car_id): Promise<any>{
+    deleteCar(id): Promise<any>{
         return new Promise(resolve=>{
-            const car = this.carModel.findByIdAndRemove(car_id);
+            const car = this.carModel.findByIdAndRemove(id).exec();
             if(!car){
                 throw new HttpException('this car is not found', 404)
             }
