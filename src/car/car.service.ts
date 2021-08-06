@@ -35,7 +35,11 @@ Cars: any[]= CARS;
          return results;
     }
 
-    
+    //Edit a car by id
+    updateCar(id, item: CarModel){
+        const car = this.carModel.findByIdAndUpdate(id, item,{new: true});
+        return car;
+    }
 
     //delete a car by car_id
     deleteCar(car_id): Promise<any>{
