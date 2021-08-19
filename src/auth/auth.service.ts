@@ -19,7 +19,7 @@ export class AuthService {
         return this.signUser(user.id, user.email, 'user');
     };
 
-    signUser(userId: number, email: string, type: string,){
+    signUser(userId: number, email: string, type: string){
         const token = this.jwtService.sign({
             sub: userId,
             email: email,
