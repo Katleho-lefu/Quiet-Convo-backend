@@ -7,8 +7,8 @@ import { AuthModule } from './auth/auth.module';
 
 
 @Module({
-  imports: [AuthModule, MongooseModule.forRoot('mongodb://localhost/nest')],
+  imports: [AuthModule, MongooseModule.forRoot('mongodb+srv://Victor:Katdarad18@learning.ozzgj.mongodb.net/QuietConvo?retryWrites=true&w=majority')],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

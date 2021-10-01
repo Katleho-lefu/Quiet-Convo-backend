@@ -1,39 +1,63 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto } from './dto';
-import {Users} from './mock'
+import {LoginDto, User} from './user.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+
 
 
 @Injectable()
 export class AuthService {
 
-    constructor(private jwtService: JwtService){}
+    logger: Logger;
 
-    users = Users;
+    constructor(@InjectModel('UserSchema') private userModel: Model<User>, private jwtService: JwtService) {
+        this.logger = new Logger(AuthService.name)
+    }
+
 
     // logging a user in
-    login(credentials: AuthDto){
-        const user = this.users.find(user=>user.email===credentials.email)
-        if(!user) throw new HttpException('User not found', 404);
-        if( user.password !== credentials.password ) throw new HttpException('Invalid credentials',404)
-        return this.signUser(user.id, user.email, 'user');
-    };
+    async login(credentials: LoginDto) {
+        let user: any;
 
-    signUser(userId: number, email: string, type: string){
+        try {
+            // Check if user exists by Email
+            user = await this.userModel.findOne({ email: credentials.email});
+            if(!user) throw new BadRequestException('User does not exist');
+            // Check if credential's password matches found user's password, if not return error
+            if(credentials.password !== user.password ) throw new BadRequestException('Wrong Password');
+            const token = this.signUser(user.email, user.password);
+            return { token, username: user.username, email: user.email };
+        } 
+        catch (error) {   
+            this.logger.error(error);
+            return new BadRequestException(error)
+        }
+    }
+    
+    // take correct user to where they were on the app i guess
+    signUser(email: string, password: string) {
         const token = this.jwtService.sign({
-            sub: userId,
             email: email,
-            type: type,
+            password: password,
         })
+
         return token;
     }
     
     // register a user
-    register(credentials: AuthDto){
-        const user = this.users.find(user=>user.email===credentials.email);
-        if(user.password===credentials.password) throw new HttpException('User already exits, please login', 401);
-        this.users.push(credentials);
-        return credentials;
+    async register(credentials: User){
+        let results: any;
+        try {
+            const new_user = new this.userModel(credentials)
+            results = await new_user.save();
+        } 
+        catch (error){
+            console.log(error);
+            if (error.code === 11000 && error.keyValue.email) throw new BadRequestException('Email already exists');
+        }
+        if (!results) throw new BadRequestException('something happened');
+        return results;
     }
 
     
