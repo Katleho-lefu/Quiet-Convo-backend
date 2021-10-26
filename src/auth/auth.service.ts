@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {LoginDto, User} from './user.model';
+import {LoginDto, RegisterDto, User} from './user.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -35,7 +35,7 @@ export class AuthService {
         }
     }
     
-    // take correct user to where they were on the app i guess
+    // take correct user to where they were on the app (🧐 I guess)
     signUser(email: string, password: string) {
         const token = this.jwtService.sign({
             email: email,
@@ -46,18 +46,18 @@ export class AuthService {
     }
     
     // register a user
-    async register(credentials: User){
+    async register(credentials: RegisterDto){
         let results: any;
         try {
             const new_user = new this.userModel(credentials)
             results = await new_user.save();
+            return results;
         } 
         catch (error){
-            console.log(error);
             if (error.code === 11000 && error.keyValue.email) throw new BadRequestException('Email already exists');
+            console.log(error);
+            
         }
-        if (!results) throw new BadRequestException('something happened');
-        return results;
     }
 
     

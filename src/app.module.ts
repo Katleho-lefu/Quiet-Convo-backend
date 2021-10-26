@@ -7,7 +7,10 @@ import { AuthModule } from './auth/auth.module';
 
 
 @Module({
-  imports: [AuthModule, MongooseModule.forRoot('mongodb+srv://Victor:Katdarad18@learning.ozzgj.mongodb.net/QuietConvo?retryWrites=true&w=majority')],
+  imports: [
+    MongooseModule.forRoot('mongodb+srv://Victor:Katdarad18@learning.ozzgj.mongodb.net/QuietConvo?retryWrites=true&w=majority'),
+    AuthModule, 
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
